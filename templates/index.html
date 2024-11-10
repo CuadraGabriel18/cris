@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask - Random Forest</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #212121;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 960px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #00796b;
+            margin-bottom: 25px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 35px;
+        }
+
+        .button {
+            background-color: #004d40;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, transform 0.2s;
+            cursor: pointer;
+            width: 100%;
+            max-width: 210px;
+            margin: 7px;
+            text-align: center;
+        }
+
+        .button:hover {
+            background-color: #00796b;
+            transform: translateY(-3px);
+        }
+
+        .output {
+            margin-top: 40px;
+        }
+
+        .output h2 {
+            color: #424242;
+            font-size: 1.7rem;
+            margin-bottom: 18px;
+        }
+
+        .output p {
+            font-size: 1.1rem;
+            color: #616161;
+            margin-bottom: 25px;
+        }
+
+        .output img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .button {
+                width: 90%;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Random Forest</h1>
+
+        <!-- Botones para cada acción -->
+        <div class="button-container">
+            <button class="button" onclick="performAction('load_data')">Cargar y Visualizar Datos</button>
+            <button class="button" onclick="performAction('train_tree')">Entrenar Árbol de Decisión</button>
+            <button class="button" onclick="performAction('decision_boundary')">Ver Frontera de Decisión</button>
+        </div>
+
+        <!-- Sección para mostrar resultados -->
+        <div class="output" id="output"></div>
+        <div class="output" id="additional_output"></div>
+    </div>
+
+    <script>
+        function performAction(action) {
+            let url = `/${action}`;
+            let method = 'POST';
+
+            fetch(url, { method: method })
+                .then(response => response.json())
+                .then(data => {
+                    let outputDiv = document.getElementById("output");
+                    let additionalOutputDiv = document.getElementById("additional_output");
+
+                    outputDiv.innerHTML = "";  // Limpiar resultados previos
+                    additionalOutputDiv.innerHTML = "";  // Limpiar resultados adicionales
+
+                    // Mostrar los resultados según la acción
+                    if (action === 'load_data') {
+                        outputDiv.innerHTML = "<h2>Primeras filas del Dataset:</h2>" + data.data;
+                    } else if (action === 'train_tree') {
+                        outputDiv.innerHTML = `<h2>Modelo Entrenado:</h2>
+                                               <p>${data.message}</p>`;
+                        additionalOutputDiv.innerHTML = `<h3>Árbol de Decisión:</h3>
+                                                       <img src="data:image/png;base64,${data.tree_image}" alt="Árbol de Decisión">`;
+                    } else if (action === 'decision_boundary') {
+                        additionalOutputDiv.innerHTML = "<h3>Frontera de Decisión:</h3>";
+                        additionalOutputDiv.innerHTML += `<img src="data:image/png;base64,${data.decision_boundary_image}" alt="Frontera de Decisión">`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al obtener los datos:", error);
+                });
+        }
+    </script>
+
+</body>
+</html>
